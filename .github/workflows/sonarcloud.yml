@@ -1,0 +1,35 @@
+name: SonarCloud & CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  analyze:
+    name: Analyze and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Execute unit tests with coverage
+        run: npm run test -- --coverage
+
+      - name: Start SonarCloud analysis
+        uses: SonarSource/sonarcloud-github-action@v1
+        with:
+          projectKey: ${{ secrets.SONAR_PROJECT_KEY_CLIENT }}
+          organization: veronika-g-00
+          token: ${{ secrets.SONAR_TOKEN }}
